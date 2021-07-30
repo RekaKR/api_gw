@@ -3,14 +3,14 @@ const router = express.Router()
 const fetch = require('node-fetch')
 const jwt = require('jsonwebtoken')
 
-
 require('dotenv').config()
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
 const GOOGLE_SECRET = process.env.GOOGLE_SECRET
 const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI
 
-router.get('/', (req, res) => {
-  fetch("https://oauth2.googleapis.com/token", {
+
+router.get('/', async (req, res) => {
+  const response = fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -23,9 +23,10 @@ router.get('/', (req, res) => {
       grant_type: "authorization_code"
     }),
   })
-    .then(res => res.json())
-    .then(data => console.log(jwt.decode(data.id_token)))
-    .catch(() => res.status(404).json({ message: 'Authentication failed!' }))
+
+  const data = await response.json()
+
+  console.log(jwt.decode(data.id_token))
 
   res.json({ message: "Hello world" })
 })
